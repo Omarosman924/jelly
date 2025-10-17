@@ -9,6 +9,7 @@ services:
     environment:
       - NODE_ENV=production
       - PORT=3000
+      - DATABASE_URL=postgresql://restaurant_user:restaurant_password@postgres:5432/restaurant_db
     expose:
       - "3000"
     volumes:

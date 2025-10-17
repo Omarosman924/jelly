@@ -1953,3 +1953,259 @@
   "version": "v2",
   "environment": "production"
 }
+{
+  "timestamp": "2025-10-17 20:33:33",
+  "level": "INFO",
+  "message": "🔧 Initializing services...",
+  "service": "restaurant-management",
+  "version": "v2",
+  "environment": "production"
+}
+{
+  "timestamp": "2025-10-17 20:33:33",
+  "level": "INFO",
+  "message": "🗄️  Connecting to database...",
+  "service": "restaurant-management",
+  "version": "v2",
+  "environment": "production"
+}
+{
+  "timestamp": "2025-10-17 20:33:33",
+  "level": "INFO",
+  "message": "Database Info Starting a postgresql pool with 9 connections.",
+  "service": "restaurant-management",
+  "version": "v2",
+  "environment": "production",
+  "target": "quaint::pooled"
+}
+{
+  "timestamp": "2025-10-17 20:33:33",
+  "level": "INFO",
+  "message": "Database connected successfully",
+  "service": "restaurant-management",
+  "version": "v2",
+  "environment": "production",
+  "provider": "postgresql",
+  "url": "postgresql://restaurant_user:***@postgres:5432/restaurant_db"
+}
+{
+  "timestamp": "2025-10-17 20:33:33",
+  "level": "INFO",
+  "message": "✅ Database connected successfully",
+  "service": "restaurant-management",
+  "version": "v2",
+  "environment": "production"
+}
+{
+  "timestamp": "2025-10-17 20:33:33",
+  "level": "INFO",
+  "message": "📡 Connecting to Redis...",
+  "service": "restaurant-management",
+  "version": "v2",
+  "environment": "production"
+}
+{
+  "timestamp": "2025-10-17 20:33:43",
+  "level": "ERROR",
+  "message": "Redis connection failed",
+  "service": "restaurant-management",
+  "version": "v2",
+  "environment": "production",
+  "error": "Redis connection timeout",
+  "attempt": 1,
+  "maxAttempts": 5
+}
+{
+  "timestamp": "2025-10-17 20:33:43",
+  "level": "WARN",
+  "message": "Redis connection failed, enabling fallback mode",
+  "service": "restaurant-management",
+  "version": "v2",
+  "environment": "production",
+  "error": "Redis connection timeout"
+}
+{
+  "timestamp": "2025-10-17 20:33:43",
+  "level": "WARN",
+  "message": "Redis fallback mode enabled - using in-memory storage",
+  "service": "restaurant-management",
+  "version": "v2",
+  "environment": "production",
+  "note": "Data will not persist across server restarts"
+}
+{
+  "timestamp": "2025-10-17 20:33:43",
+  "level": "WARN",
+  "message": "⚠️  Redis unavailable - running in fallback mode",
+  "service": "restaurant-management",
+  "version": "v2",
+  "environment": "production"
+}
+{
+  "timestamp": "2025-10-17 20:33:43",
+  "level": "INFO",
+  "message": "🔧 Initializing enhanced service container...",
+  "service": "restaurant-management",
+  "version": "v2",
+  "environment": "production"
+}
+{
+  "timestamp": "2025-10-17 20:33:53",
+  "level": "ERROR",
+  "message": "Redis connection failed",
+  "service": "restaurant-management",
+  "version": "v2",
+  "environment": "production",
+  "error": "Redis connection timeout",
+  "attempt": 2,
+  "maxAttempts": 5
+}
+{
+  "timestamp": "2025-10-17 20:33:53",
+  "level": "WARN",
+  "message": "Redis connection failed, enabling fallback mode",
+  "service": "restaurant-management",
+  "version": "v2",
+  "environment": "production",
+  "error": "Redis connection timeout"
+}
+{
+  "timestamp": "2025-10-17 20:33:53",
+  "level": "WARN",
+  "message": "Redis fallback mode enabled - using in-memory storage",
+  "service": "restaurant-management",
+  "version": "v2",
+  "environment": "production",
+  "note": "Data will not persist across server restarts"
+}
+{
+  "timestamp": "2025-10-17 20:33:53",
+  "level": "INFO",
+  "message": "📦 Registered 8 service classes",
+  "service": "restaurant-management",
+  "version": "v2",
+  "environment": "production"
+}
+{
+  "timestamp": "2025-10-17 20:33:53",
+  "level": "INFO",
+  "message": "✅ Service container initialized successfully in 20177ms",
+  "service": "restaurant-management",
+  "version": "v2",
+  "environment": "production"
+}
+{
+  "timestamp": "2025-10-17 20:33:53",
+  "level": "INFO",
+  "message": "🎉 All services initialized successfully",
+  "service": "restaurant-management",
+  "version": "v2",
+  "environment": "production"
+}
+{
+  "timestamp": "2025-10-17 20:33:53",
+  "level": "INFO",
+  "message": "🎉 Application started successfully!",
+  "service": "restaurant-management",
+  "version": "v2",
+  "environment": "production"
+}
+{
+  "timestamp": "2025-10-17 20:33:53",
+  "level": "INFO",
+  "message": "🚀 Restaurant Management System V2 started successfully!",
+  "service": "restaurant-management",
+  "version": "v2",
+  "environment": "production"
+}
+{
+  "timestamp": "2025-10-17 20:33:53",
+  "level": "INFO",
+  "message": "📡 Server running on port 3000",
+  "service": "restaurant-management",
+  "version": "v2",
+  "environment": "production"
+}
+{
+  "timestamp": "2025-10-17 20:33:53",
+  "level": "INFO",
+  "message": "🌍 Environment: production",
+  "service": "restaurant-management",
+  "version": "v2",
+  "environment": "production"
+}
+{
+  "timestamp": "2025-10-17 20:33:53",
+  "level": "INFO",
+  "message": "🔗 Health check: http://localhost:3000/health",
+  "service": "restaurant-management",
+  "version": "v2",
+  "environment": "production"
+}
+{
+  "timestamp": "2025-10-17 20:33:53",
+  "level": "INFO",
+  "message": "📚 API Base URL: http://localhost:3000/api",
+  "service": "restaurant-management",
+  "version": "v2",
+  "environment": "production"
+}
+{
+  "timestamp": "2025-10-17 20:34:42",
+  "level": "INFO",
+  "message": "🔧 Initializing services...",
+  "service": "restaurant-management",
+  "version": "v2",
+  "environment": "production"
+}
+{
+  "timestamp": "2025-10-17 20:34:42",
+  "level": "INFO",
+  "message": "🗄️  Connecting to database...",
+  "service": "restaurant-management",
+  "version": "v2",
+  "environment": "production"
+}
+{
+  "timestamp": "2025-10-17 20:34:42",
+  "level": "INFO",
+  "message": "Database Info Starting a postgresql pool with 9 connections.",
+  "service": "restaurant-management",
+  "version": "v2",
+  "environment": "production",
+  "target": "quaint::pooled"
+}
+{
+  "timestamp": "2025-10-17 20:34:43",
+  "level": "INFO",
+  "message": "Database connected successfully",
+  "service": "restaurant-management",
+  "version": "v2",
+  "environment": "production",
+  "provider": "postgresql",
+  "url": "postgresql://restaurant_user:***@postgres:5432/restaurant_db"
+}
+{
+  "timestamp": "2025-10-17 20:34:43",
+  "level": "INFO",
+  "message": "✅ Database connected successfully",
+  "service": "restaurant-management",
+  "version": "v2",
+  "environment": "production"
+}
+{
+  "timestamp": "2025-10-17 20:34:43",
+  "level": "INFO",
+  "message": "📡 Connecting to Redis...",
+  "service": "restaurant-management",
+  "version": "v2",
+  "environment": "production"
+}
+{
+  "timestamp": "2025-10-17 20:34:48",
+  "level": "INFO",
+  "message": "Received SIGTERM. Starting graceful shutdown...",
+  "service": "restaurant-management",
+  "version": "v2",
+  "environment": "production"
+}

@@ -210,3 +210,25 @@
   "attempt": 2,
   "maxAttempts": 5
 }
+{
+  "timestamp": "2025-10-17 20:33:43",
+  "level": "ERROR",
+  "message": "Redis connection failed",
+  "service": "restaurant-management",
+  "version": "v2",
+  "environment": "production",
+  "error": "Redis connection timeout",
+  "attempt": 1,
+  "maxAttempts": 5
+}
+{
+  "timestamp": "2025-10-17 20:33:53",
+  "level": "ERROR",
+  "message": "Redis connection failed",
+  "service": "restaurant-management",
+  "version": "v2",
+  "environment": "production",
+  "error": "Redis connection timeout",
+  "attempt": 2,
+  "maxAttempts": 5
+}
