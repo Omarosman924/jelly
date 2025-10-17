@@ -1,0 +1,163 @@
+.logo-image {
+  height: 100px !important;
+  width: auto !important;
+}
+
+@media (max-width: 768px) {
+  .logo-image {
+    height: 70px !important;
+  }
+}
+
+.cashier aside {
+  width: 4em;
+  min-height: 87vh;
+  background-color: var(--bg-100);
+  overflow: hidden;
+}
+
+html[lang="ar"] .cashier aside {
+  border-top-left-radius: 0.5em;
+  border-bottom-left-radius: 0.5em;
+}
+html[lang="en"] .cashier aside {
+  border-top-right-radius: 0.5em;
+  border-bottom-right-radius: 0.5em;
+}
+
+aside a {
+  color: var(--primary-200);
+  width: 100%;
+  display: block;
+  text-align: center;
+  padding: 0.5em 0;
+  font-size: 1.5em;
+}
+
+aside a:hover {
+  background-color: var(--bg-200);
+  color: var(--primary-100);
+  text-decoration: none;
+}
+
+aside a.active {
+  background-color: var(--primary-100);
+  color: white;
+}
+
+.cashier main {
+  width: calc(100% - 4em);
+  min-height: 87vh;
+  background-color: var(--bg-50);
+}
+
+.cashier .menu {
+  width: calc(100% - 300px);
+}
+
+.cashier .chekout {
+  background-color: var(--bg-200);
+  width: 300px;
+  padding: 1em;
+  box-shadow: var(--shadow-100) 0px 3px 8px;
+  border-radius: 1em;
+}
+
+.cashier .chekout .checkoutItem {
+  background-color: var(--bg-100);
+  border-radius: 0.5em;
+  padding: 0.5em 0;
+}
+
+.category-item {
+  width: 9em;
+  height: 9em;
+  font-size: 0.8em;
+  color: var(--primary-100) !important;
+}
+
+.category-item.active {
+  background-color: var(--primary-100) !important;
+  color: white !important;
+  box-shadow: 0 2px 8px var(--shadow-100);
+}
+
+@media (max-width: 576px) {
+  .category-item {
+    width: 7em;
+    height: 7em;
+    font-size: 0.7em;
+  }
+}
+
+.menuItem {
+  cursor: pointer;
+  transition: transform 0.2s;
+  width: 220px !important;
+}
+
+.MealTypeSelector .badge {
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.MealTypeSelector .badge:hover {
+  transform: scale(1.05);
+  box-shadow: 0 2px 8px var(--shadow-100);
+  background-color: var(--primary-100) !important;
+  color: white !important;
+}
+
+.add-to-order {
+  border-radius: 50% !important;
+  background-color: var(--primary-100) !important;
+  color: white !important;
+  width: 2.5em;
+  height: 2.5em;
+  display: flex !important;
+  justify-content: center;
+  align-items: center;
+  padding: 0 !important;
+}
+
+.quantity-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.quantity-btn {
+  width: 20px;
+  height: 20px;
+  border: 1px solid #ddd;
+  background: white;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.quantity-btn:hover {
+  background: #2a5298;
+  color: white;
+}
+
+.quantity-input {
+  width: 48px;
+  text-align: center;
+  border: 1px solid #ddd;
+  padding: 5px;
+  border-radius: 5px;
+}
+
+.checkoutInner {
+  min-height: 78vh;
+}
+
+.checkoutItem .btn-close {
+  font-size: 0.8em;
+  border-radius: 50%;
+  background-color: red !important;
+}

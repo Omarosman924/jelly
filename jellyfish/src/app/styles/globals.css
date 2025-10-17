@@ -1,0 +1,169 @@
+@import url(./variables.css);
+
+.sayHi  p{
+  font-size: 1.2em;
+  font-weight: 600;
+  color: var(--text-100) !important;
+}
+.logo {
+  height: 100px !important;
+  width: auto !important;
+}
+@media (max-width: 576px) {
+  .logo {
+    height: 80px !important;
+}
+}
+
+.search {
+  max-width: 30rem;
+  min-width: 20rem;
+}
+
+.form-control-search {
+  border-radius: 50rem !important;
+  padding-right: 2.5rem; /* مساحة للأيقونة */
+}
+
+.search-icon {
+  pointer-events: none;
+}
+
+.justify-self-md-center {
+  justify-self: center !important;
+}
+
+.menuOrder {
+  background-color: var(--bg-100);
+  border-radius: 1em;
+  padding: 0.5em 1em;
+}
+
+.menuOrder h3 {
+  color: var(--primary-100) !important;
+}
+
+.order-item-image {
+  border: 1px solid #dee2e6;
+  transition: transform 0.2s ease;
+}
+
+.order-item-image:hover {
+  transform: scale(1.05);
+}
+
+.order-item {
+  transition: box-shadow 0.2s ease;
+}
+
+.order-item:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.quantity-controls button {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.orderItem-quantity-badge {
+  width: 1.5em;
+  height: 1.5em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+html[lang="ar"] .orderItem-quantity-badge {
+  transform: translate(-50%, -50%);
+}
+html[lang="en"] .orderItem-quantity-badge {
+  transform: translate(50%, -50%);
+}
+
+.order-summary {
+  background-color: var(--bg-200);
+}
+
+.category-item {
+  width: 9em;
+  height: 9em;
+  font-size: 0.8em;
+  color: var(--primary-100) !important;
+}
+
+.category-item.active {
+  background-color: var(--primary-100) !important;
+  color: white !important;
+  box-shadow: 0 2px 8px var(--shadow-100);
+}
+
+@media (max-width: 576px) {
+  .category-item {
+    width: 7em;
+    height: 7em;
+    font-size: 0.7em;
+  }
+}
+.price {
+  color: var(--accent-100) !important;
+  font-weight: 600;
+  font-size: 1.1em;
+}
+
+.card-title {
+  color: var(--primary-100) !important;
+}
+
+.mealTypeBadge {
+  font-size: 0.7em !important;
+  padding: 0.3em 0.6em !important;
+  background-color: var(--primary-100-50) !important;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.mealTypeBadge.active,
+.mealTypeBadge:hover {
+  background-color: var(--primary-100) !important;
+  color: white !important;
+}
+
+.quantity-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 15px 0;
+}
+
+.quantity-input {
+  width: 60px;
+  text-align: center;
+  border: 1px solid var(--bg-300) ;
+  padding: 5px;
+  border-radius: 5px;
+  background-color: var(--bg-100);
+  color: var(--text-100) !important;
+}
+
+.quantity-btn {
+  width: 30px;
+  height: 30px;
+  border: 1px solid var(--bg-300);
+  background: var(--primary-100);
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  color: var(--text-100) !important;
+}
+
+.card-header {
+  border-top-right-radius: 1em;
+  border-top-left-radius: 1em;
+}

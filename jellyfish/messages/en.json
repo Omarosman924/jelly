@@ -1,0 +1,62 @@
+{
+  "welcome": "Welcome",
+  "menu": "Menu",
+  "checkout": "Checkout",
+  "nav": {
+    "sayHi": "Hey,",
+    "search": "🔎Search..."
+  },
+  "promotions": {
+    "validUntil": "Valid until:",
+    "prevSlide": "Previous slide",
+    "nextSlide": "Next slide",
+    "goToSlide": "Go to slide {index}",
+    "orderNow": "Order Now",
+    "tryNow": "Try Now",
+    "bookNow": "Book Now",
+    "new": "New",
+    "limitedOffer": "Limited offer",
+    "limitedTime": "For limited time",
+    "freshShrimpTitle": "Special Offer on Fresh Shrimp",
+    "freshShrimpDesc": "Get 25% discount on all types of fresh shrimp",
+    "grilledSalmonTitle": "Grilled Salmon Meal",
+    "grilledSalmonDesc": "Taste the finest grilled salmon with fresh vegetables",
+    "seafoodBoxTitle": "Seafood Box",
+    "seafoodBoxDesc": "A diverse selection of the finest seafood in one box"
+  },"aside": {
+    "orderMenu": "Order Menu",
+    "total": "Total",
+    "checkout": "Checkout",
+    "emptyCart": "Your Order is empty"
+  },
+  "order": {
+    "item": "Item",
+    "quantity": "Quantity",
+    "unitPrice": "Unit Price",
+    "vatRate": "VAT Rate",
+    "vatAmount": "VAT Amount",
+    "total": "Total",
+    "grandTotal": "Grand Total",
+    "showDetails": "Show Details",
+    "hideDetails": "Hide Details",
+    "checkout": "Checkout"  
+  },
+  "currency": {
+    "sar": "ر.س"
+  },
+  "categories": {
+    "all": "All",
+    "shrimp": "Shrimp",
+    "salmon": "Salmon",
+    "crab": "Crab",
+    "lobster": "Lobster",
+    "tuna": "Tuna",
+    "fish": "Fish",
+    "categories": "Categories"
+  },
+  "menu": {
+    "item": {
+      "prepTime": "Preparation Time"
+    }
+  }
+}

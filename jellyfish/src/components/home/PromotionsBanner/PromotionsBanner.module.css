@@ -1,0 +1,247 @@
+/* PromotionsBanner.module.css */
+
+.promotionBanner {
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+}
+
+.bannerContainer {
+  position: relative;
+  width: 100%;
+  height: 250px;
+}
+
+.swiperContainer {
+  width: 100%;
+  height: 250px;
+  position: relative;
+}
+
+.bannerImageWrapper {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+}
+
+.slideWrapper {
+  width: 100%;
+  height: 250px;
+  position: relative;
+  overflow: hidden;
+}
+
+.bannerImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+/* تخصيص Swiper Navigation */
+.promotionBanner :global(.swiper-button-next),
+.promotionBanner :global(.swiper-button-prev) {
+  color: white;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(4px);
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  margin-top: -20px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.promotionBanner :global(.swiper-button-next) {
+  right: 15px;
+}
+
+.promotionBanner :global(.swiper-button-prev) {
+  left: 15px;
+}
+
+.promotionBanner :global(.swiper-button-next):hover,
+.promotionBanner :global(.swiper-button-prev):hover {
+  color: white;
+  background: rgba(0, 0, 0, 0.6);
+  border-color: rgba(255, 255, 255, 0.4);
+  transform: scale(1.1);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+}
+
+.promotionBanner :global(.swiper-button-next::after),
+.promotionBanner :global(.swiper-button-prev::after) {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.promotionBanner :global(.swiper-button-disabled) {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.promotionBanner :global(.swiper-button-disabled):hover {
+  transform: none;
+  background: rgba(0, 0, 0, 0.4);
+}
+
+/* تخصيص Swiper Pagination */
+.promotionBanner :global(.swiper-pagination) {
+  bottom: 20px;
+}
+
+.promotionBanner :global(.swiper-pagination-bullet) {
+  width: 12px;
+  height: 12px;
+  background: rgba(255, 255, 255, 0.5);
+  border: 2px solid transparent;
+  transition: all 0.3s ease;
+  margin: 0 4px;
+}
+
+.promotionBanner :global(.swiper-pagination-bullet-active) {
+  background: white;
+  border-color: rgba(0, 0, 0, 0.2);
+  transform: scale(1.2);
+}
+
+/* الاستجابة للشاشات المختلفة */
+@media (max-width: 1200px) {
+  .bannerContainer,
+  .swiperContainer,
+  .slideWrapper {
+    height: 220px;
+  }
+}
+
+@media (max-width: 992px) {
+  .bannerContainer,
+  .swiperContainer,
+  .slideWrapper {
+    height: 200px;
+  }
+}
+
+@media (max-width: 768px) {
+  .bannerContainer,
+  .swiperContainer,
+  .slideWrapper {
+    height: 180px;
+  }
+  
+  .promotionBanner :global(.swiper-button-next),
+  .promotionBanner :global(.swiper-button-prev) {
+    width: 25px;
+    height: 25px;
+    margin-top: -16px;
+  }
+  
+  .promotionBanner :global(.swiper-button-next) {
+    right: 10px;
+  }
+
+  .promotionBanner :global(.swiper-button-prev) {
+    left: 10px;
+  }
+  
+  .promotionBanner :global(.swiper-button-next::after),
+  .promotionBanner :global(.swiper-button-prev::after) {
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 576px) {
+  .bannerContainer,
+  .swiperContainer,
+  .slideWrapper {
+    height: 160px;
+  }
+  
+  .promotionBanner :global(.swiper-pagination) {
+    bottom: 15px;
+  }
+  
+  .promotionBanner :global(.swiper-pagination-bullet) {
+    width: 10px;
+    height: 10px;
+    margin: 0 3px;
+  }
+}
+
+@media (max-width: 480px) {
+  .bannerContainer,
+  .swiperContainer,
+  .slideWrapper {
+    height: 140px;
+  }
+  
+  .promotionBanner :global(.swiper-button-next),
+  .promotionBanner :global(.swiper-button-prev) {
+    width: 28px;
+    height: 28px;
+    margin-top: -14px;
+    border-width: 1.5px;
+  }
+
+  .promotionBanner :global(.swiper-button-next) {
+    right: 8px;
+  }
+
+  .promotionBanner :global(.swiper-button-prev) {
+    left: 8px;
+  }
+  
+  .promotionBanner :global(.swiper-button-next::after),
+  .promotionBanner :global(.swiper-button-prev::after) {
+    font-size: 11px;
+  }
+  
+  .promotionBanner :global(.swiper-pagination) {
+    bottom: 10px;
+  }
+  
+  .promotionBanner :global(.swiper-pagination-bullet) {
+    width: 8px;
+    height: 8px;
+    margin: 0 2px;
+  }
+}
+
+/* دعم RTL */
+.rtl .promotionBanner :global(.swiper-button-next) {
+  right: auto;
+  left: 15px;
+}
+
+.rtl .promotionBanner :global(.swiper-button-prev) {
+  left: auto;
+  right: 15px;
+}
+
+/* RTL للشاشات المتوسطة */
+@media (max-width: 768px) {
+  .rtl .promotionBanner :global(.swiper-button-next) {
+    right: auto;
+    left: 10px;
+  }
+
+  .rtl .promotionBanner :global(.swiper-button-prev) {
+    left: auto;
+    right: 10px;
+  }
+}
+
+/* RTL للشاشات الصغيرة */
+@media (max-width: 480px) {
+  .rtl .promotionBanner :global(.swiper-button-next) {
+    right: auto;
+    left: 8px;
+  }
+
+  .rtl .promotionBanner :global(.swiper-button-prev) {
+    left: auto;
+    right: 8px;
+  }
+}

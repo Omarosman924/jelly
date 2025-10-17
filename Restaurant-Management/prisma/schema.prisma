@@ -1,0 +1,1274 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Enums
+enum UserRole {
+  ADMIN
+  END_USER
+  DELIVERY
+  CASHIER
+  KITCHEN
+  HALL_MANAGER
+}
+
+enum OtpPurpose {
+  REGISTRATION
+  LOGIN
+  PASSWORD_RESET
+  PHONE_VERIFICATION
+  TWO_FACTOR_AUTH
+  EMAIL_VERIFICATION
+}
+
+enum ShiftType {
+  MORNING
+  EVENING
+  NIGHT
+}
+
+enum ItemType {
+  CONSUMABLE
+  PAYABLE
+}
+
+enum TableType {
+  DOUBLE
+  TRIPLE
+  QUAD
+  FAMILY
+}
+
+enum TableStatus {
+  AVAILABLE
+  OCCUPIED
+  RESERVED
+  CLEANING
+}
+
+enum ReservationStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+  COMPLETED
+}
+
+enum PartyLocationType {
+  RESTAURANT
+  EXTERNAL
+}
+
+enum PartyServiceType {
+  COOKING_ONLY
+  FULL_SERVICE
+}
+
+enum OrderType {
+  DINE_IN
+  TAKEAWAY
+  DELIVERY
+  PARTY
+  OPEN_BUFFET
+}
+
+enum CustomerType {
+  INDIVIDUAL
+  COMPANY
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  PREPARING
+  READY
+  SERVED
+  DELIVERED
+  CANCELLED
+}
+
+enum OrderItemStatus {
+  PENDING
+  PREPARING
+  READY
+  SERVED
+}
+
+enum PaymentMethod {
+  CASH
+  CARD
+  DIGITAL_WALLET
+}
+
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  REFUNDED
+}
+
+enum InvoiceStatus {
+  ISSUED
+  CANCELLED
+}
+
+enum MovementType {
+  SUPPLY
+  WASTE
+  SALE
+  ADJUSTMENT
+}
+
+enum RequestStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum EndCondition {
+  TIME_BASED
+  QUANTITY_BASED
+  BOTH
+}
+
+enum DiscountType {
+  PERCENTAGE
+  FIXED_AMOUNT
+}
+
+enum ReportType {
+  INVENTORY
+  SALES
+  TAXES
+  ORDERS_TIMING
+  SUPPLIES
+  WASTE
+  DAILY
+  WEEKLY
+  MONTHLY
+  CUSTOM
+}
+
+enum DataType {
+  STRING
+  NUMBER
+  BOOLEAN
+  JSON
+}
+
+enum NotificationType {
+  ORDER_UPDATE
+  LOW_STOCK
+  PAYMENT_RECEIVED
+  RESERVATION_REMINDER
+  SYSTEM_ALERT
+  WASTE_REQUEST
+  SUPPLY_INVOICE
+}
+
+enum SettingCategory {
+  SYSTEM
+  PAYMENT
+  TAX
+  NOTIFICATION
+  INVENTORY
+  REPORTING
+}
+
+// إضافة enum جديد لنوع العنصر في الطلب
+enum OrderItemType {
+  ITEM
+  RECIPE
+  MEAL
+}
+
+// Users and Authentication
+model User {
+  id           Int       @id @default(autoincrement())
+  phone        String    @unique
+  email        String?   @unique
+  passwordHash String?   @map("password_hash")
+  firstName    String    @map("first_name")
+  lastName     String    @map("last_name")
+  role         UserRole  @default(END_USER)
+  isActive     Boolean   @default(true) @map("is_active")
+  isVerified   Boolean   @default(false) @map("is_verified")
+  version      Int       @default(1)
+  deletedAt    DateTime? @map("deleted_at")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+
+  // Relations
+  customer               Customer?
+  staff                  Staff?
+  systemLogs             SystemLog[]
+  notifications          Notification[]
+  otpVerifications       OtpVerification[]
+  criticalActionLogs     CriticalActionLog[] // ← أضف هذا السطر
+  wasteRequestsRequested WasteRequest[]       @relation("RequestedBy")
+  wasteRequestsApproved  WasteRequest[]       @relation("ApprovedBy")
+  stockMovements         StockMovement[]
+  supplyInvoicesApproved SupplyInvoice[]
+  orderStatusHistories   OrderStatusHistory[]
+  reports                Report[]
+
+  @@index([phone])
+  @@index([email])
+  @@index([role])
+  @@index([isActive])
+  @@index([isVerified])
+  @@index([deletedAt])
+  @@map("users")
+}
+
+model OtpVerification {
+  id          Int        @id @default(autoincrement())
+  userId      Int?       @map("user_id") // null للتسجيل الجديد
+  phone       String
+  otp         String // مشفر
+  purpose     OtpPurpose
+  expiresAt   DateTime   @map("expires_at")
+  isUsed      Boolean    @default(false) @map("is_used")
+  attempts    Int        @default(0)
+  maxAttempts Int        @default(3) @map("max_attempts")
+  ipAddress   String?    @map("ip_address")
+  userAgent   String?    @map("user_agent")
+  createdAt   DateTime   @default(now()) @map("created_at")
+
+  user User? @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([phone])
+  @@index([userId])
+  @@index([expiresAt])
+  @@index([isUsed])
+  @@map("otp_verifications")
+}
+
+model BlockedPhone {
+  id        Int       @id @default(autoincrement())
+  phone     String    @unique
+  reason    String
+  blockedBy Int       @map("blocked_by")
+  blockedAt DateTime  @default(now()) @map("blocked_at")
+  expiresAt DateTime? @map("expires_at")
+
+  @@index([phone])
+  @@index([expiresAt])
+  @@map("blocked_phones")
+}
+
+// Notifications
+model Notification {
+  id        Int              @id @default(autoincrement())
+  userId    Int              @map("user_id")
+  title     String
+  message   String
+  type      NotificationType
+  isRead    Boolean          @default(false) @map("is_read")
+  metadata  Json             @default("{}") // تصحيح: إزالة ? وإضافة قيمة افتراضية
+  createdAt DateTime         @default(now()) @map("created_at")
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([createdAt])
+  @@index([isRead])
+  @@map("notifications")
+}
+
+// Customer specific information
+model Customer {
+  id             Int       @id @default(autoincrement())
+  userId         Int       @unique @map("user_id")
+  address        String?
+  city           String?
+  district       String?
+  deliveryAreaId Int?      @map("delivery_area_id")
+  loyaltyPoints  Int       @default(0) @map("loyalty_points")
+  lastOrderDate  DateTime? @map("last_order_date")
+  version        Int       @default(1)
+  deletedAt      DateTime? @map("deleted_at")
+
+  // Relations
+  user              User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  deliveryArea      DeliveryArea?      @relation("CustomerDeliveryArea", fields: [deliveryAreaId], references: [id])
+  addresses         CustomerAddress[] // ✅ أضف هذا السطر
+  companyCustomers  CompanyCustomer[]
+  tableReservations TableReservation[]
+  partyOrders       PartyOrder[]
+  buffetBookings    BuffetBooking[]
+  orders            Order[]
+  invoices          Invoice[]
+
+  @@index([deliveryAreaId])
+  @@index([deletedAt])
+  @@map("customers")
+}
+
+model CustomerAddress {
+  id                  Int       @id @default(autoincrement())
+  customerId          Int       @map("customer_id")
+  label               String // "Home", "Work", etc.
+  address             String
+  city                String
+  district            String
+  deliveryAreaId      Int       @map("delivery_area_id")
+  buildingNumber      String?   @map("building_number")
+  floor               String?
+  apartment           String?
+  landmark            String?
+  specialInstructions String?   @map("special_instructions")
+  latitude            Decimal?  @db.Decimal(10, 8)
+  longitude           Decimal?  @db.Decimal(11, 8)
+  isDefault           Boolean   @default(false) @map("is_default")
+  deletedAt           DateTime? @map("deleted_at")
+  createdAt           DateTime  @default(now()) @map("created_at")
+  updatedAt           DateTime  @updatedAt @map("updated_at")
+
+  customer     Customer     @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  deliveryArea DeliveryArea @relation(fields: [deliveryAreaId], references: [id])
+
+  @@index([customerId])
+  @@index([deliveryAreaId])
+  @@index([isDefault])
+  @@index([deletedAt])
+  @@map("customer_addresses")
+}
+
+// Company Customers
+model CompanyCustomer {
+  id                 Int       @id @default(autoincrement())
+  customerId         Int       @map("customer_id")
+  companyName        String    @map("company_name")
+  taxNumber          String    @unique @map("tax_number") // إضافة unique
+  commercialRegister String?   @unique @map("commercial_register") // إضافة unique
+  nationalAddress    String?   @map("national_address")
+  contactPerson      String?   @map("contact_person")
+  contactPhone       String?   @map("contact_phone")
+  isActive           Boolean   @default(true) @map("is_active")
+  version            Int       @default(1)
+  deletedAt          DateTime? @map("deleted_at")
+  createdAt          DateTime  @default(now()) @map("created_at")
+
+  // Relations
+  customer Customer  @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  orders   Order[]
+  invoices Invoice[]
+
+  @@index([customerId])
+  @@index([taxNumber])
+  @@index([deletedAt])
+  @@map("company_customers")
+}
+
+// Staff specific information
+model Staff {
+  id           Int        @id @default(autoincrement())
+  userId       Int        @unique @map("user_id")
+  employeeCode String     @unique @map("employee_code")
+  salary       Decimal?
+  hireDate     DateTime   @map("hire_date")
+  shiftType    ShiftType? @map("shift_type")
+  isOnDuty     Boolean    @default(false) @map("is_on_duty")
+  version      Int        @default(1)
+  deletedAt    DateTime?  @map("deleted_at")
+
+  // Relations
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  ordersCashier     Order[] @relation("CashierOrders")
+  ordersKitchen     Order[] @relation("KitchenOrders")
+  ordersHallManager Order[] @relation("HallManagerOrders")
+  ordersDelivery    Order[] @relation("DeliveryOrders")
+
+  @@index([employeeCode])
+  @@index([shiftType])
+  @@index([isOnDuty])
+  @@index([deletedAt])
+  @@map("staff")
+}
+
+// Delivery Areas
+model DeliveryArea {
+  id                    Int       @id @default(autoincrement())
+  areaName              String    @map("area_name")
+  deliveryFee           Decimal   @map("delivery_fee")
+  estimatedDeliveryTime Int       @map("estimated_delivery_time_minutes")
+  isActive              Boolean   @default(true) @map("is_active")
+  version               Int       @default(1)
+  deletedAt             DateTime? @map("deleted_at")
+
+  // Relations
+  customers         Customer[]        @relation("CustomerDeliveryArea") // ✅ أضف اسم العلاقة
+  customerAddresses CustomerAddress[] // ✅ أضف هذا السطر
+
+  @@index([isActive])
+  @@index([deletedAt])
+  @@map("delivery_areas")
+}
+
+// Units of Measurement
+model Unit {
+  id          Int       @id @default(autoincrement())
+  unitNameAr  String    @map("unit_name_ar")
+  unitNameEn  String    @map("unit_name_en")
+  unitSymbol  String    @unique @map("unit_symbol") // إضافة unique
+  description String?
+  isActive    Boolean   @default(true) @map("is_active")
+  version     Int       @default(1)
+  deletedAt   DateTime? @map("deleted_at")
+
+  // Relations
+  items Item[]
+
+  @@index([isActive])
+  @@index([deletedAt])
+  @@map("units")
+}
+
+model Category {
+  id             Int       @id @default(autoincrement())
+  categoryNameAr String    @map("category_name_ar")
+  categoryNameEn String    @map("category_name_en")
+  description    String?
+  imageUrl       String?   @map("image_url")
+  displayOrder   Int       @default(0) @map("display_order")
+  isActive       Boolean   @default(true) @map("is_active")
+  version        Int       @default(1)
+  deletedAt      DateTime? @map("deleted_at")
+  createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime  @updatedAt @map("updated_at")
+
+  // Relations
+  items     Item[]
+  recipes   Recipe[]
+  meals     Meal[]
+  menuItems MenuItem[]
+
+  @@index([isActive])
+  @@index([displayOrder])
+  @@index([deletedAt])
+  @@map("categories")
+}
+
+model Menu {
+  id           Int       @id @default(autoincrement())
+  menuNameAr   String    @map("menu_name_ar")
+  menuNameEn   String    @map("menu_name_en")
+  description  String?
+  imageUrl     String?   @map("image_url")
+  displayOrder Int       @default(0) @map("display_order")
+  isActive     Boolean   @default(true) @map("is_active")
+  startDate    DateTime? @map("start_date")
+  endDate      DateTime? @map("end_date")
+  version      Int       @default(1)
+  deletedAt    DateTime? @map("deleted_at")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+
+  // Relations
+  menuItems MenuItem[]
+
+  @@index([isActive])
+  @@index([startDate, endDate])
+  @@index([deletedAt])
+  @@map("menus")
+}
+
+model MenuItem {
+  id            Int       @id @default(autoincrement())
+  menuId        Int       @map("menu_id")
+  categoryId    Int?      @map("category_id")
+  itemId        Int?      @map("item_id")
+  recipeId      Int?      @map("recipe_id")
+  mealId        Int?      @map("meal_id")
+  displayOrder  Int       @default(0) @map("display_order")
+  specialPrice  Decimal?  @map("special_price")
+  isAvailable   Boolean   @default(true) @map("is_available")
+  isRecommended Boolean   @default(false) @map("is_recommended")
+  version       Int       @default(1)
+  deletedAt     DateTime? @map("deleted_at")
+  createdAt     DateTime  @default(now()) @map("created_at")
+
+  // Relations
+  menu     Menu      @relation(fields: [menuId], references: [id], onDelete: Cascade)
+  category Category? @relation(fields: [categoryId], references: [id])
+  item     Item?     @relation(fields: [itemId], references: [id])
+  recipe   Recipe?   @relation(fields: [recipeId], references: [id])
+  meal     Meal?     @relation(fields: [mealId], references: [id])
+
+  // إضافة constraints فريدة
+  @@unique([menuId, itemId], name: "unique_menu_item")
+  @@unique([menuId, recipeId], name: "unique_menu_recipe")
+  @@unique([menuId, mealId], name: "unique_menu_meal")
+  @@index([menuId])
+  @@index([categoryId])
+  @@index([isAvailable])
+  @@index([deletedAt])
+  @@map("menu_items")
+}
+
+// Items (Consumable & Payable)
+model Item {
+  id              Int       @id @default(autoincrement())
+  itemCode        String    @unique @map("item_code")
+  itemNameAr      String    @map("item_name_ar")
+  itemNameEn      String    @map("item_name_en")
+  description     String?
+  categoryId      Int?      @map("category_id")
+  unitId          Int       @map("unit_id")
+  itemType        ItemType  @map("item_type")
+  costPrice       Decimal   @map("cost_price")
+  sellingPrice    Decimal   @map("selling_price")
+  currentStock    Decimal   @default(0) @map("current_stock")
+  minStockLevel   Decimal   @map("min_stock_level")
+  caloriesPerUnit Int?      @map("calories_per_unit")
+  imageUrl        String?   @map("image_url")
+  isAvailable     Boolean   @default(true) @map("is_available")
+  version         Int       @default(1)
+  deletedAt       DateTime? @map("deleted_at")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+
+  // Relations
+  category           Category?           @relation(fields: [categoryId], references: [id])
+  unit               Unit                @relation(fields: [unitId], references: [id])
+  menuItems          MenuItem[]
+  orderItems         OrderItem[]
+  recipeItems        RecipeItem[]
+  mealItems          MealItem[]
+  supplyInvoiceItems SupplyInvoiceItem[]
+  wasteRequests      WasteRequest[]
+  stockMovements     StockMovement[]
+
+  @@index([itemCode])
+  @@index([categoryId])
+  @@index([unitId])
+  @@index([itemType])
+  @@index([isAvailable])
+  @@index([currentStock])
+  @@index([deletedAt])
+  @@map("items")
+}
+
+// Recipes
+model Recipe {
+  id              Int       @id @default(autoincrement())
+  recipeCode      String    @unique @map("recipe_code")
+  recipeNameAr    String    @map("recipe_name_ar")
+  recipeNameEn    String    @map("recipe_name_en")
+  description     String?
+  categoryId      Int?      @map("category_id")
+  totalCost       Decimal   @map("total_cost")
+  sellingPrice    Decimal   @map("selling_price")
+  preparationTime Int       @map("preparation_time_minutes")
+  totalCalories   Int?      @map("total_calories")
+  imageUrl        String?   @map("image_url")
+  isAvailable     Boolean   @default(true) @map("is_available")
+  version         Int       @default(1)
+  deletedAt       DateTime? @map("deleted_at")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+
+  // Relations
+  category    Category?    @relation(fields: [categoryId], references: [id])
+  menuItems   MenuItem[]
+  orderItems  OrderItem[]
+  recipeItems RecipeItem[]
+  mealRecipes MealRecipe[]
+
+  @@index([recipeCode])
+  @@index([categoryId])
+  @@index([isAvailable])
+  @@index([deletedAt])
+  @@map("recipes")
+}
+
+// إضافة نموذج RecipeItem المفقود
+model RecipeItem {
+  id        Int      @id @default(autoincrement())
+  recipeId  Int      @map("recipe_id")
+  itemId    Int      @map("item_id")
+  quantity  Decimal
+  unitCost  Decimal  @map("unit_cost")
+  totalCost Decimal  @map("total_cost")
+  version   Int      @default(1)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  recipe Recipe @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+  item   Item   @relation(fields: [itemId], references: [id])
+
+  @@unique([recipeId, itemId])
+  @@index([recipeId])
+  @@index([itemId])
+  @@map("recipe_items")
+}
+
+// Meals
+model Meal {
+  id              Int       @id @default(autoincrement())
+  mealCode        String    @unique @map("meal_code")
+  mealNameAr      String    @map("meal_name_ar")
+  mealNameEn      String    @map("meal_name_en")
+  description     String?
+  categoryId      Int?      @map("category_id")
+  totalCost       Decimal   @map("total_cost")
+  sellingPrice    Decimal   @map("selling_price")
+  preparationTime Int       @map("preparation_time_minutes")
+  totalCalories   Int?      @map("total_calories")
+  imageUrl        String?   @map("image_url")
+  isAvailable     Boolean   @default(true) @map("is_available")
+  version         Int       @default(1)
+  deletedAt       DateTime? @map("deleted_at")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+
+  // Relations
+  category    Category?    @relation(fields: [categoryId], references: [id])
+  menuItems   MenuItem[]
+  orderItems  OrderItem[]
+  mealRecipes MealRecipe[]
+  mealItems   MealItem[]
+
+  @@index([mealCode])
+  @@index([categoryId])
+  @@index([isAvailable])
+  @@index([deletedAt])
+  @@map("meals")
+}
+
+// Meal Recipes
+model MealRecipe {
+  id       Int     @id @default(autoincrement())
+  mealId   Int     @map("meal_id")
+  recipeId Int     @map("recipe_id")
+  quantity Decimal
+  cost     Decimal
+  version  Int     @default(1)
+
+  // Relations
+  meal   Meal   @relation(fields: [mealId], references: [id], onDelete: Cascade)
+  recipe Recipe @relation(fields: [recipeId], references: [id])
+
+  @@unique([mealId, recipeId])
+  @@index([mealId])
+  @@index([recipeId])
+  @@map("meal_recipes")
+}
+
+// Meal Items
+model MealItem {
+  id       Int     @id @default(autoincrement())
+  mealId   Int     @map("meal_id")
+  itemId   Int     @map("item_id")
+  quantity Decimal
+  cost     Decimal
+  version  Int     @default(1)
+
+  // Relations
+  meal Meal @relation(fields: [mealId], references: [id], onDelete: Cascade)
+  item Item @relation(fields: [itemId], references: [id])
+
+  @@unique([mealId, itemId])
+  @@index([mealId])
+  @@index([itemId])
+  @@map("meal_items")
+}
+
+// Cooking Methods
+model CookingMethod {
+  id             Int       @id @default(autoincrement())
+  methodNameAr   String    @map("method_name_ar")
+  methodNameEn   String    @map("method_name_en")
+  description    String?
+  cookingTime    Int       @map("cooking_time_minutes")
+  additionalCost Decimal   @map("additional_cost")
+  isAvailable    Boolean   @default(true) @map("is_available")
+  version        Int       @default(1)
+  deletedAt      DateTime? @map("deleted_at")
+
+  // Relations
+  orderItems OrderItem[]
+
+  @@index([isAvailable])
+  @@index([deletedAt])
+  @@map("cooking_methods")
+}
+
+// Tables
+model Table {
+  id                  Int         @id @default(autoincrement())
+  tableNumber         String      @unique @map("table_number")
+  tableType           TableType   @map("table_type")
+  tableStatus         TableStatus @default(AVAILABLE) @map("table_status")
+  capacity            Int
+  locationDescription String?     @map("location_description")
+  isActive            Boolean     @default(true) @map("is_active")
+  version             Int         @default(1)
+  deletedAt           DateTime?   @map("deleted_at")
+
+  // Relations
+  tableReservations TableReservation[]
+  orders            Order[]
+
+  @@index([tableNumber])
+  @@index([tableStatus])
+  @@index([isActive])
+  @@index([deletedAt])
+  @@map("tables")
+}
+
+// Table Reservations
+model TableReservation {
+  id                  Int               @id @default(autoincrement())
+  tableId             Int               @map("table_id")
+  customerId          Int               @map("customer_id")
+  reservationDateTime DateTime          @map("reservation_datetime")
+  partySize           Int               @map("party_size")
+  status              ReservationStatus @default(PENDING)
+  specialRequests     String?           @map("special_requests")
+  version             Int               @default(1)
+  createdAt           DateTime          @default(now()) @map("created_at")
+
+  // Relations
+  table    Table    @relation(fields: [tableId], references: [id])
+  customer Customer @relation(fields: [customerId], references: [id])
+
+  @@index([tableId])
+  @@index([customerId])
+  @@index([reservationDateTime])
+  @@index([status])
+  @@map("table_reservations")
+}
+
+// Party Types
+model PartyType {
+  id             Int       @id @default(autoincrement())
+  typeName       String    @map("type_name")
+  description    String?
+  imageUrl       String?   @map("image_url")
+  pricePerPerson Decimal   @map("price_per_person")
+  isActive       Boolean   @default(true) @map("is_active")
+  version        Int       @default(1)
+  deletedAt      DateTime? @map("deleted_at")
+  createdAt      DateTime  @default(now()) @map("created_at")
+
+  // Relations
+  partyOrders PartyOrder[]
+
+  @@index([isActive])
+  @@index([deletedAt])
+  @@map("party_types")
+}
+
+// Party Orders
+model PartyOrder {
+  id              Int               @id @default(autoincrement())
+  partyTypeId     Int               @map("party_type_id")
+  customerId      Int               @map("customer_id")
+  numberOfPeople  Int               @map("number_of_people")
+  eventDateTime   DateTime          @map("event_datetime")
+  locationType    PartyLocationType @map("location_type")
+  serviceType     PartyServiceType  @map("service_type")
+  totalAmount     Decimal           @map("total_amount")
+  status          OrderStatus       @default(PENDING)
+  specialRequests String?           @map("special_requests")
+  version         Int               @default(1)
+  createdAt       DateTime          @default(now()) @map("created_at")
+
+  // Relations
+  partyType PartyType @relation(fields: [partyTypeId], references: [id])
+  customer  Customer  @relation(fields: [customerId], references: [id])
+
+  @@index([partyTypeId])
+  @@index([customerId])
+  @@index([eventDateTime])
+  @@index([status])
+  @@map("party_orders")
+}
+
+// Open Buffet
+model OpenBuffet {
+  id                  Int       @id @default(autoincrement())
+  buffetName          String    @map("buffet_name")
+  description         String?
+  imageUrl            String?   @map("image_url")
+  entryPricePerPerson Decimal   @map("entry_price_per_person")
+  maxCapacity         Int       @map("max_capacity")
+  buffetDate          DateTime  @map("buffet_date")
+  startTime           DateTime  @map("start_time")
+  endTime             DateTime  @map("end_time")
+  currentBookings     Int       @default(0) @map("current_bookings")
+  isActive            Boolean   @default(true) @map("is_active")
+  version             Int       @default(1)
+  deletedAt           DateTime? @map("deleted_at")
+  createdAt           DateTime  @default(now()) @map("created_at")
+
+  // Relations
+  buffetBookings BuffetBooking[]
+
+  @@index([buffetDate])
+  @@index([isActive])
+  @@index([deletedAt])
+  @@map("open_buffet")
+}
+
+// Open Buffet Bookings
+model BuffetBooking {
+  id              Int         @id @default(autoincrement())
+  buffetId        Int         @map("buffet_id")
+  customerId      Int         @map("customer_id")
+  numberOfPeople  Int         @map("number_of_people")
+  totalAmount     Decimal     @map("total_amount")
+  status          OrderStatus @default(CONFIRMED)
+  bookingDateTime DateTime    @map("booking_datetime")
+  version         Int         @default(1)
+  createdAt       DateTime    @default(now()) @map("created_at")
+
+  // Relations
+  buffet   OpenBuffet @relation(fields: [buffetId], references: [id])
+  customer Customer   @relation(fields: [customerId], references: [id])
+
+  @@index([buffetId])
+  @@index([customerId])
+  @@index([bookingDateTime])
+  @@map("buffet_bookings")
+}
+
+// Offers
+model Offer {
+  id            Int          @id @default(autoincrement())
+  offerName     String       @map("offer_name")
+  description   String?
+  startDateTime DateTime     @map("start_datetime")
+  endDateTime   DateTime     @map("end_datetime")
+  maxQuantity   Int?         @map("max_quantity")
+  usedQuantity  Int          @default(0) @map("used_quantity")
+  endCondition  EndCondition @map("end_condition")
+  discountType  DiscountType @map("discount_type")
+  discountValue Decimal      @map("discount_value")
+  targetType    String       @map("target_type") // item, recipe, meal
+  targetId      Int          @map("target_id")
+  isActive      Boolean      @default(true) @map("is_active")
+  version       Int          @default(1)
+  deletedAt     DateTime?    @map("deleted_at")
+  createdAt     DateTime     @default(now()) @map("created_at")
+
+  @@index([startDateTime, endDateTime])
+  @@index([isActive])
+  @@index([targetType, targetId])
+  @@index([deletedAt])
+  @@map("offers")
+}
+
+// Suppliers
+model Supplier {
+  id                  Int       @id @default(autoincrement())
+  supplierName        String    @map("supplier_name")
+  taxNumber           String?   @unique @map("tax_number") // إضافة unique
+  commercialRegister  String?   @unique @map("commercial_register") // إضافة unique
+  nationalAddress     String?   @map("national_address")
+  representativeName  String?   @map("representative_name")
+  representativePhone String?   @map("representative_phone")
+  contactEmail        String?   @map("contact_email")
+  isActive            Boolean   @default(true) @map("is_active")
+  version             Int       @default(1)
+  deletedAt           DateTime? @map("deleted_at")
+  createdAt           DateTime  @default(now()) @map("created_at")
+
+  // Relations
+  supplyInvoices SupplyInvoice[]
+
+  @@index([supplierName])
+  @@index([isActive])
+  @@index([deletedAt])
+  @@map("suppliers")
+}
+
+// Supply Invoices
+model SupplyInvoice {
+  id                Int           @id @default(autoincrement())
+  invoiceNumber     String        @unique @map("invoice_number")
+  supplierId        Int           @map("supplier_id")
+  invoiceDate       DateTime      @map("invoice_date")
+  subtotal          Decimal
+  taxAmount         Decimal       @map("tax_amount")
+  totalAmount       Decimal       @map("total_amount")
+  invoiceImageUrl   String?       @map("invoice_image_url")
+  status            RequestStatus @default(PENDING)
+  approvedByStaffId Int?          @map("approved_by_staff_id")
+  approvedAt        DateTime?     @map("approved_at")
+  version           Int           @default(1)
+  createdAt         DateTime      @default(now()) @map("created_at")
+
+  // Relations
+  supplier           Supplier            @relation(fields: [supplierId], references: [id])
+  approvedByStaff    User?               @relation(fields: [approvedByStaffId], references: [id])
+  supplyInvoiceItems SupplyInvoiceItem[]
+
+  @@index([invoiceNumber])
+  @@index([supplierId])
+  @@index([status])
+  @@index([invoiceDate])
+  @@map("supply_invoices")
+}
+
+// Supply Invoice Items
+model SupplyInvoiceItem {
+  id              Int     @id @default(autoincrement())
+  supplyInvoiceId Int     @map("supply_invoice_id")
+  itemId          Int     @map("item_id")
+  quantity        Decimal
+  unitCost        Decimal @map("unit_cost")
+  totalCost       Decimal @map("total_cost")
+  version         Int     @default(1)
+
+  // Relations
+  supplyInvoice SupplyInvoice @relation(fields: [supplyInvoiceId], references: [id], onDelete: Cascade)
+  item          Item          @relation(fields: [itemId], references: [id])
+
+  @@unique([supplyInvoiceId, itemId])
+  @@index([supplyInvoiceId])
+  @@index([itemId])
+  @@map("supply_invoice_items")
+}
+
+// Waste Requests
+model WasteRequest {
+  id                 Int           @id @default(autoincrement())
+  itemId             Int           @map("item_id")
+  requestedByStaffId Int           @map("requested_by_staff_id")
+  wasteQuantity      Decimal       @map("waste_quantity")
+  reason             String?
+  status             RequestStatus @default(PENDING)
+  approvedByAdminId  Int?          @map("approved_by_admin_id")
+  requestedAt        DateTime      @default(now()) @map("requested_at")
+  approvedAt         DateTime?     @map("approved_at")
+  adminNotes         String?       @map("admin_notes")
+  version            Int           @default(1)
+
+  // Relations
+  item             Item  @relation(fields: [itemId], references: [id])
+  requestedByStaff User  @relation("RequestedBy", fields: [requestedByStaffId], references: [id])
+  approvedByAdmin  User? @relation("ApprovedBy", fields: [approvedByAdminId], references: [id])
+
+  @@index([itemId])
+  @@index([requestedByStaffId])
+  @@index([status])
+  @@index([requestedAt])
+  @@map("waste_requests")
+}
+
+// Stock Movements
+model StockMovement {
+  id               Int          @id @default(autoincrement())
+  itemId           Int          @map("item_id")
+  movementType     MovementType @map("movement_type")
+  quantityChange   Decimal      @map("quantity_change")
+  quantityBefore   Decimal      @map("quantity_before")
+  quantityAfter    Decimal      @map("quantity_after")
+  referenceId      Int?         @map("reference_id")
+  referenceType    String?      @map("reference_type")
+  createdByStaffId Int          @map("created_by_staff_id")
+  version          Int          @default(1)
+  createdAt        DateTime     @default(now()) @map("created_at")
+
+  // Relations
+  item           Item @relation(fields: [itemId], references: [id])
+  createdByStaff User @relation(fields: [createdByStaffId], references: [id])
+
+  @@index([itemId])
+  @@index([movementType])
+  @@index([createdAt])
+  @@index([createdByStaffId])
+  @@index([itemId, createdAt]) // فهرس مركب محسن
+  @@map("stock_movements")
+}
+
+// Orders
+model Order {
+  id                    Int          @id @default(autoincrement())
+  orderNumber           String       @unique @map("order_number")
+  customerId            Int?         @map("customer_id")
+  companyId             Int?         @map("company_id")
+  tableId               Int?         @map("table_id")
+  cashierId             Int?         @map("cashier_id")
+  kitchenStaffId        Int?         @map("kitchen_staff_id")
+  hallManagerId         Int?         @map("hall_manager_id")
+  deliveryStaffId       Int?         @map("delivery_staff_id")
+  orderType             OrderType    @map("order_type")
+  customerType          CustomerType @map("customer_type")
+  orderStatus           OrderStatus  @default(PENDING) @map("order_status")
+  subtotal              Decimal
+  taxAmount             Decimal      @map("tax_amount")
+  deliveryFee           Decimal?     @map("delivery_fee")
+  discountAmount        Decimal?     @map("discount_amount")
+  totalAmount           Decimal      @map("total_amount")
+  orderDateTime         DateTime     @default(now()) @map("order_datetime")
+  confirmedAt           DateTime?    @map("confirmed_at")
+  kitchenStartAt        DateTime?    @map("kitchen_start_at")
+  readyAt               DateTime?    @map("ready_at")
+  servedAt              DateTime?    @map("served_at")
+  deliveredAt           DateTime?    @map("delivered_at")
+  estimatedReadyTime    DateTime?    @map("estimated_ready_time")
+  estimatedDeliveryTime DateTime?    @map("estimated_delivery_time")
+  specialInstructions   String?      @map("special_instructions")
+  cancellationReason    String?      @map("cancellation_reason")
+  isPaid                Boolean      @default(false) @map("is_paid")
+  version               Int          @default(1)
+  createdAt             DateTime     @default(now()) @map("created_at")
+  updatedAt             DateTime     @updatedAt @map("updated_at")
+
+  // Relations
+  customer           Customer?            @relation(fields: [customerId], references: [id])
+  companyCustomer    CompanyCustomer?     @relation(fields: [companyId], references: [id])
+  table              Table?               @relation(fields: [tableId], references: [id])
+  cashier            Staff?               @relation("CashierOrders", fields: [cashierId], references: [id])
+  kitchenStaff       Staff?               @relation("KitchenOrders", fields: [kitchenStaffId], references: [id])
+  hallManager        Staff?               @relation("HallManagerOrders", fields: [hallManagerId], references: [id])
+  deliveryStaff      Staff?               @relation("DeliveryOrders", fields: [deliveryStaffId], references: [id])
+  orderItems         OrderItem[]
+  orderStatusHistory OrderStatusHistory[]
+  payments           Payment[]
+  invoice            Invoice?
+
+  @@index([orderNumber])
+  @@index([customerId])
+  @@index([orderType])
+  @@index([orderStatus])
+  @@index([orderDateTime])
+  @@index([isPaid])
+  @@index([orderType, orderStatus]) // فهرس مركب محسن
+  @@index([customerId, orderDateTime]) // فهرس مركب محسن
+  @@map("orders")
+}
+
+// Order Items - محسن مع نهج أفضل
+model OrderItem {
+  id                  Int             @id @default(autoincrement())
+  orderId             Int             @map("order_id")
+  itemType            OrderItemType   @map("item_type")
+  itemId              Int?            @map("item_id")
+  recipeId            Int?            @map("recipe_id")
+  mealId              Int?            @map("meal_id")
+  cookingMethodId     Int?            @map("cooking_method_id")
+  quantity            Decimal
+  unitPrice           Decimal         @map("unit_price")
+  totalPrice          Decimal         @map("total_price")
+  specialInstructions String?         @map("special_instructions")
+  status              OrderItemStatus @default(PENDING)
+  version             Int             @default(1)
+  createdAt           DateTime        @default(now()) @map("created_at")
+
+  // Relations
+  order         Order          @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  item          Item?          @relation(fields: [itemId], references: [id])
+  recipe        Recipe?        @relation(fields: [recipeId], references: [id])
+  meal          Meal?          @relation(fields: [mealId], references: [id])
+  cookingMethod CookingMethod? @relation(fields: [cookingMethodId], references: [id])
+
+  @@index([orderId])
+  @@index([itemId])
+  @@index([recipeId])
+  @@index([mealId])
+  @@index([status])
+  @@map("order_items")
+}
+
+// Order Status History
+model OrderStatusHistory {
+  id               Int          @id @default(autoincrement())
+  orderId          Int          @map("order_id")
+  oldStatus        OrderStatus? @map("old_status") // جعلها nullable
+  newStatus        OrderStatus  @map("new_status")
+  changedByStaffId Int          @map("changed_by_staff_id")
+  notes            String?
+  version          Int          @default(1)
+  changedAt        DateTime     @default(now()) @map("changed_at")
+
+  // Relations
+  order          Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  changedByStaff User  @relation(fields: [changedByStaffId], references: [id])
+
+  @@index([orderId])
+  @@index([changedByStaffId])
+  @@index([changedAt])
+  @@map("order_status_history")
+}
+
+// Payments
+model Payment {
+  id                   Int           @id @default(autoincrement())
+  orderId              Int           @map("order_id")
+  paymentMethod        PaymentMethod @map("payment_method")
+  amountPaid           Decimal       @map("amount_paid")
+  paymentStatus        PaymentStatus @default(PENDING) @map("payment_status")
+  transactionReference String?       @map("transaction_reference")
+  paymentDateTime      DateTime      @default(now()) @map("payment_datetime")
+  version              Int           @default(1)
+
+  // Relations
+  order Order @relation(fields: [orderId], references: [id])
+
+  @@index([orderId])
+  @@index([paymentMethod])
+  @@index([paymentStatus])
+  @@index([paymentDateTime])
+  @@map("payments")
+}
+
+// Invoices (Saudi Tax Compliance)
+model Invoice {
+  id                 Int           @id @default(autoincrement())
+  invoiceNumber      String        @unique @map("invoice_number")
+  orderId            Int           @unique @map("order_id")
+  customerId         Int?          @map("customer_id")
+  companyId          Int?          @map("company_id")
+  subtotal           Decimal
+  vatAmount          Decimal       @map("vat_amount")
+  totalAmount        Decimal       @map("total_amount")
+  qrCode             String?       @map("qr_code")
+  invoiceDataXml     String?       @map("invoice_data_xml")
+  invoiceStatus      InvoiceStatus @default(ISSUED) @map("invoice_status")
+  issueDateTime      DateTime      @default(now()) @map("issue_datetime")
+  zatcaUuid          String?       @map("zatca_uuid")
+  isSimplified       Boolean       @default(true) @map("is_simplified")
+  cancellationReason String?       @map("cancellation_reason")
+  version            Int           @default(1)
+
+  // Relations
+  order           Order            @relation(fields: [orderId], references: [id])
+  customer        Customer?        @relation(fields: [customerId], references: [id])
+  companyCustomer CompanyCustomer? @relation(fields: [companyId], references: [id])
+  invoiceItems    InvoiceItem[]
+
+  @@index([invoiceNumber])
+  @@index([orderId])
+  @@index([customerId])
+  @@index([issueDateTime])
+  @@map("invoices")
+}
+
+// Invoice Items
+model InvoiceItem {
+  id              Int     @id @default(autoincrement())
+  invoiceId       Int     @map("invoice_id")
+  itemDescription String  @map("item_description")
+  quantity        Decimal
+  unitPrice       Decimal @map("unit_price")
+  vatRate         Decimal @map("vat_rate")
+  vatAmount       Decimal @map("vat_amount")
+  totalAmount     Decimal @map("total_amount")
+  version         Int     @default(1)
+
+  // Relations
+  invoice Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+
+  @@index([invoiceId])
+  @@map("invoice_items")
+}
+
+// Reports
+model Report {
+  id                   Int        @id @default(autoincrement())
+  reportName           String     @map("report_name")
+  reportType           ReportType @map("report_type")
+  reportDateFrom       DateTime?  @map("report_date_from")
+  reportDateTo         DateTime?  @map("report_date_to")
+  generatedByStaffId   Int        @map("generated_by_staff_id")
+  reportParametersJson String?    @map("report_parameters_json")
+  reportDataJson       String?    @map("report_data_json")
+  filePath             String?    @map("file_path")
+  version              Int        @default(1)
+  generatedAt          DateTime   @default(now()) @map("generated_at")
+
+  // Relations
+  generatedByStaff User @relation(fields: [generatedByStaffId], references: [id])
+
+  @@index([reportType])
+  @@index([generatedByStaffId])
+  @@index([generatedAt])
+  @@map("reports")
+}
+
+// System Logs
+model SystemLog {
+  id        Int      @id @default(autoincrement())
+  userId    Int?     @map("user_id")
+  action    String
+  tableName String?  @map("table_name")
+  recordId  Int?     @map("record_id")
+  oldValues String?  @map("old_values")
+  newValues String?  @map("new_values")
+  ipAddress String?  @map("ip_address")
+  userAgent String?  @map("user_agent")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  // Relations
+  user User? @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([action])
+  @@index([tableName])
+  @@index([createdAt])
+  @@index([tableName, recordId]) // فهرس مركب محسن
+  @@map("system_logs")
+}
+
+model CriticalActionLog {
+  id             Int       @id @default(autoincrement())
+  userId         Int       @map("user_id")
+  action         String
+  details        String    @db.Text
+  requiresReview Boolean   @default(true) @map("requires_review")
+  reviewedBy     Int?      @map("reviewed_by")
+  reviewedAt     DateTime? @map("reviewed_at")
+  timestamp      DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([timestamp])
+  @@index([requiresReview])
+  @@map("critical_action_logs")
+}
+
+// User archive (for soft deletes)
+model UserArchive {
+  id             Int      @id @default(autoincrement())
+  originalUserId Int      @map("original_user_id")
+  userData       String   @db.Text
+  archivedAt     DateTime @default(now()) @map("archived_at")
+  archivedReason String   @map("archived_reason")
+
+  @@index([originalUserId])
+  @@index([archivedAt])
+  @@map("user_archives")
+}
+
+// Settings
+model Setting {
+  id           Int             @id @default(autoincrement())
+  settingKey   String          @unique @map("setting_key")
+  settingValue String          @map("setting_value")
+  description  String?
+  category     SettingCategory @default(SYSTEM)
+  dataType     DataType        @map("data_type")
+  isEncrypted  Boolean         @default(false) @map("is_encrypted")
+  isEditable   Boolean         @default(true) @map("is_editable")
+  version      Int             @default(1)
+  updatedAt    DateTime        @updatedAt @map("updated_at")
+
+  @@index([category])
+  @@index([settingKey])
+  @@map("settings")
+}

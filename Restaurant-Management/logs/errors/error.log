@@ -1,0 +1,137 @@
+{
+  "timestamp": "2025-10-16 13:50:45",
+  "level": "ERROR",
+  "message": "Redis connection failed",
+  "service": "restaurant-management",
+  "version": "v2",
+  "environment": "production",
+  "error": "Redis connection timeout",
+  "attempt": 1,
+  "maxAttempts": 5
+}
+{
+  "timestamp": "2025-10-16 13:50:55",
+  "level": "ERROR",
+  "message": "Redis connection failed",
+  "service": "restaurant-management",
+  "version": "v2",
+  "environment": "production",
+  "error": "Redis connection timeout",
+  "attempt": 2,
+  "maxAttempts": 5
+}
+{
+  "timestamp": "2025-10-16 13:53:26",
+  "level": "ERROR",
+  "message": "Database Error Error in PostgreSQL connection: Error { kind: Db, cause: Some(DbError { severity: \"FATAL\", parsed_severity: Some(Fatal), code: SqlState(E57P01), message: \"terminating connection due to administrator command\", detail: None, hint: None, position: None, where_: None, schema: None, table: None, column: None, datatype: None, constraint: None, file: Some(\"postgres.c\"), line: Some(3211), routine: Some(\"ProcessInterrupts\") }) }",
+  "service": "restaurant-management",
+  "version": "v2",
+  "environment": "production",
+  "target": "quaint::connector::postgres::native"
+}
+{
+  "timestamp": "2025-10-16 13:53:44",
+  "level": "ERROR",
+  "message": "Redis connection failed",
+  "service": "restaurant-management",
+  "version": "v2",
+  "environment": "production",
+  "error": "Redis connection timeout",
+  "attempt": 1,
+  "maxAttempts": 5
+}
+{
+  "timestamp": "2025-10-16 13:53:54",
+  "level": "ERROR",
+  "message": "Redis connection failed",
+  "service": "restaurant-management",
+  "version": "v2",
+  "environment": "production",
+  "error": "Redis connection timeout",
+  "attempt": 2,
+  "maxAttempts": 5
+}
+{
+  "timestamp": "2025-10-16 14:00:55",
+  "level": "ERROR",
+  "message": "Redis connection failed",
+  "service": "restaurant-management",
+  "version": "v2",
+  "environment": "production",
+  "error": "Redis connection timeout",
+  "attempt": 1,
+  "maxAttempts": 5
+}
+{
+  "timestamp": "2025-10-16 14:01:05",
+  "level": "ERROR",
+  "message": "Redis connection failed",
+  "service": "restaurant-management",
+  "version": "v2",
+  "environment": "production",
+  "error": "Redis connection timeout",
+  "attempt": 2,
+  "maxAttempts": 5
+}
+{
+  "timestamp": "2025-10-16 14:48:51",
+  "level": "ERROR",
+  "message": "Database Error Error in PostgreSQL connection: Error { kind: Db, cause: Some(DbError { severity: \"FATAL\", parsed_severity: Some(Fatal), code: SqlState(E57P01), message: \"terminating connection due to administrator command\", detail: None, hint: None, position: None, where_: None, schema: None, table: None, column: None, datatype: None, constraint: None, file: Some(\"postgres.c\"), line: Some(3211), routine: Some(\"ProcessInterrupts\") }) }",
+  "service": "restaurant-management",
+  "version": "v2",
+  "environment": "production",
+  "target": "quaint::connector::postgres::native"
+}
+{
+  "timestamp": "2025-10-16 15:34:44",
+  "level": "ERROR",
+  "message": "Redis connection failed",
+  "service": "restaurant-management",
+  "version": "v2",
+  "environment": "production",
+  "error": "Redis connection timeout",
+  "attempt": 1,
+  "maxAttempts": 5
+}
+{
+  "timestamp": "2025-10-16 15:34:54",
+  "level": "ERROR",
+  "message": "Redis connection failed",
+  "service": "restaurant-management",
+  "version": "v2",
+  "environment": "production",
+  "error": "Redis connection timeout",
+  "attempt": 2,
+  "maxAttempts": 5
+}
+{
+  "timestamp": "2025-10-17 19:16:44",
+  "level": "ERROR",
+  "message": "Redis connection failed",
+  "service": "restaurant-management",
+  "version": "v2",
+  "environment": "production",
+  "error": "Redis connection timeout",
+  "attempt": 1,
+  "maxAttempts": 5
+}
+{
+  "timestamp": "2025-10-17 19:16:54",
+  "level": "ERROR",
+  "message": "Redis connection failed",
+  "service": "restaurant-management",
+  "version": "v2",
+  "environment": "production",
+  "error": "Redis connection timeout",
+  "attempt": 2,
+  "maxAttempts": 5
+}
+{
+  "timestamp": "2025-10-17 19:22:59",
+  "level": "ERROR",
+  "message": "Database Error Error in PostgreSQL connection: Error { kind: Closed, cause: None }",
+  "service": "restaurant-management",
+  "version": "v2",
+  "environment": "production",
+  "target": "quaint::connector::postgres::native"
+}
