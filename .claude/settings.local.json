@@ -8,7 +8,8 @@
       "Bash(curl:*)",
       "Bash(docker-compose up:*)",
       "Bash(docker-compose stop:*)",
-      "Bash(docker-compose:*)"
+      "Bash(docker-compose:*)",
+      "Bash(git add:*)"
     ],
     "deny": [],
     "ask": []
